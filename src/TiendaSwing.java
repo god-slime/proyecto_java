@@ -4,26 +4,27 @@ import java.awt.*;
 class Producto {
     String nombre;
     int cantidad;
-	double precio;
+    double precio;
 
     public Producto(String n, double p, int c) {
         nombre = n;
-        cantidad=c;
+        cantidad = c;
         precio = p;
     }
 
     public String toString2() {
-        return nombre + " - $" + precio + " " + cantidad + " en el carrito.";
+        return nombre + " - $" + precio + " (" + cantidad + " en el carrito)";
     }
 
     public String toString() {
-        return nombre + " - $" + precio + " - " + cantidad + " en stock.";
+        return nombre + " - $" + precio + " - " + cantidad + " en stock";
     }
 }
 
-
 public class TiendaSwing extends JFrame {
-    double Total_comprado=0;
+
+    double Total_comprado = 0;
+
     DefaultListModel<Producto> modeloProductos = new DefaultListModel<>();
     DefaultListModel<Producto> modeloCarrito = new DefaultListModel<>();
 
@@ -43,12 +44,28 @@ public class TiendaSwing extends JFrame {
 
         setLayout(new BorderLayout());
 
-        // Panel centro
+        // Renderer especial para el carrito
+        listaCarrito.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                    JList<?> list, Object value, int index,
+                    boolean isSelected, boolean cellHasFocus) {
+
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                        list, value, index, isSelected, cellHasFocus);
+
+                if (value instanceof Producto) {
+                    label.setText(((Producto) value).toString2());
+                }
+
+                return label;
+            }
+        });
+
         JPanel centro = new JPanel(new GridLayout(1, 2));
         centro.add(new JScrollPane(listaProductos));
         centro.add(new JScrollPane(listaCarrito));
 
-        // Botones
         JButton btnAgregar = new JButton("Agregar →");
         JButton btnQuitar = new JButton("← Quitar");
         JButton btnPagar = new JButton("Pagar");
@@ -58,7 +75,6 @@ public class TiendaSwing extends JFrame {
         botones.add(btnQuitar);
         botones.add(btnPagar);
 
-        // Barra de estado
         JPanel barraEstado = new JPanel(new BorderLayout());
         barraEstado.setBorder(BorderFactory.createEtchedBorder());
         lblTotal.setHorizontalAlignment(SwingConstants.LEFT);
@@ -68,7 +84,6 @@ public class TiendaSwing extends JFrame {
         add(botones, BorderLayout.NORTH);
         add(barraEstado, BorderLayout.SOUTH);
 
-        // Eventos
         btnAgregar.addActionListener(e -> agregar());
         btnQuitar.addActionListener(e -> quitar());
         btnPagar.addActionListener(e -> pagar());
@@ -81,15 +96,13 @@ public class TiendaSwing extends JFrame {
         modeloProductos.addElement(new Producto("Audífonos", 899.99, 100));
         modeloProductos.addElement(new Producto("Monitor", 3499.99, 100));
         modeloProductos.addElement(new Producto("pantalla de 30 pulgadas", 2499.99, 10));
-        modeloProductos.addElement(new Producto("Gabriel", .99, 1));
-
     }
 
     void agregar() {
         Producto p = listaProductos.getSelectedValue();
         if (p != null) {
-            p.cantidad=1;
-			modeloCarrito.addElement(p);
+            Producto copia = new Producto(p.nombre, p.precio, 1);
+            modeloCarrito.addElement(copia);
             actualizarTotal();
         }
     }
@@ -102,12 +115,12 @@ public class TiendaSwing extends JFrame {
         }
     }
 
-    double Total_precio(){
+    double Total_precio() {
         double total = 0;
         for (int i = 0; i < modeloCarrito.size(); i++) {
             total += modeloCarrito.get(i).precio;
         }
-return total;
+        return total;
     }
 
     void actualizarTotal() {
@@ -119,9 +132,13 @@ return total;
             JOptionPane.showMessageDialog(this, "El carrito está vacío.");
             return;
         }
-        double Total=Total_precio();
-        JOptionPane.showMessageDialog(this, "Pago realizado. El total fue de " + Total + ". ¡Gracias por su compra!");
-        Total_comprado+=Total;
+
+        double Total = Total_precio();
+
+        JOptionPane.showMessageDialog(this,
+                "Pago realizado. El total fue de " + Total + ". ¡Gracias por su compra!");
+
+        Total_comprado += Total;
         modeloCarrito.clear();
         actualizarTotal();
     }
