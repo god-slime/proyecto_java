@@ -1,0 +1,7 @@
+# Formato: nombre=stock=precio
+Laptop=100=11999.99
+Mouse=100=249.99
+Teclado=100=599.99
+Audifonos=100=899.99
+Monitor=100=3499.99
+Pantalla de 30 pulgadas=10=2499.99
